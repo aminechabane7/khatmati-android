@@ -1,0 +1,6 @@
+{
+  "name": "ختمتي",
+  "description": "تطبيق ختمتي القرآني ورفيق المسلم اليومي لمتابعة الورد والأذكار ومواقيت الصلاة",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ختمتي</string>
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_quran">القرآن</string>
+    <string name="nav_khatmati">ختمتي</string>
+    <string name="nav_adhkar">الأذكار</string>
+    <string name="nav_more">المزيد</string>
+</resources>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Crescent accent above -->
+    <path
+        android:fillColor="#E5C158"
+        android:pathData="M54,23 C52.2,23 50.5,23.5 49.1,24.3 C51.3,25.6 52.8,27.9 52.8,30.6 C52.8,33.3 51.3,35.6 49.1,36.9 C50.5,37.7 52.2,38.2 54,38.2 C58.2,38.2 61.6,34.8 61.6,30.6 C61.6,26.4 58.2,23 54,23 Z" />
+    
+    <!-- Wooden Stand (Rehal) Base -->
+    <path
+        android:fillColor="#8C6D37"
+        android:pathData="M37,73 L47,67 L61,67 L71,73 L75,77 L69,77 L54,69 L39,77 L33,77 Z" />
+    <path
+        android:fillColor="#684F25"
+        android:pathData="M43,77 L54,70 L65,77 L62,80 L54,74 L46,80 Z" />
+
+    <!-- Quran Cover Base (Shadow/Border) -->
+    <path
+        android:fillColor="#0D352F"
+        android:pathData="M27,45 C35,43 46,46 54,49 C62,46 73,43 81,45 L81,69 C73,67 62,70 54,73 C46,70 35,67 27,69 Z" />
+
+    <!-- Quran Open Pages Left -->
+    <path
+        android:fillColor="#FBF7EE"
+        android:pathData="M28,46 C36,44 46,47 53.5,49.8 L53.5,71.5 C46,68.8 36,66 28,68 Z" />
+
+    <!-- Quran Open Pages Right -->
+    <path
+        android:fillColor="#F5EEDB"
+        android:pathData="M80,46 C72,44 62,47 54.5,49.8 L54.5,71.5 C62,68.8 72,66 80,68 Z" />
+
+    <!-- Text line hints on left page -->
+    <path
+        android:fillColor="#C4B99D"
+        android:pathData="M33,52 C37,51 43,52.5 49,54 L49,55 C43,53.5 37,52 33,53 Z" />
+    <path
+        android:fillColor="#C4B99D"
+        android:pathData="M33,57 C37,56 43,57.5 49,59 L49,60 C43,58.5 37,57 33,58 Z" />
+    <path
+        android:fillColor="#C4B99D"
+        android:pathData="M33,62 C37,61 43,62.5 49,64 L49,65 C43,63.5 37,62 33,63 Z" />
+
+    <!-- Text line hints on right page -->
+    <path
+        android:fillColor="#B8AC8E"
+        android:pathData="M59,54 C65,52.5 71,51 75,52 L75,53 C71,52 65,53.5 59,55 Z" />
+    <path
+        android:fillColor="#B8AC8E"
+        android:pathData="M59,59 C65,57.5 71,56 75,57 L75,58 C71,57 65,58.5 59,60 Z" />
+    <path
+        android:fillColor="#B8AC8E"
+        android:pathData="M59,64 C65,62.5 71,61 75,62 L75,63 C71,62 65,63.5 59,65 Z" />
+
+    <!-- Golden Bookmark Ribbon down center -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M52.5,47 L55.5,47 L55.5,76 L54,74.5 L52.5,76 Z" />
+
+    <!-- Central spine line -->
+    <path
+        android:fillColor="#C5A059"
+        android:pathData="M53.5,49 L54.5,49 L54.5,72.5 L53.5,72.5 Z" />
+</vector>
