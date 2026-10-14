@@ -8,6 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -148,12 +151,18 @@ fun KhatmatiApp() {
                 )
             ) { backStackEntry ->
                 val surahNumber = backStackEntry.arguments?.getInt("surahNumber") ?: 1
-                val viewModel = remember(surahNumber) {
-                    val handle = backStackEntry.savedStateHandle.apply {
-                        set("surahNumber", surahNumber)
+                val viewModel: com.example.feature.quranreader.QuranReaderViewModel = viewModel(
+                    viewModelStoreOwner = backStackEntry,
+                    factory = object : ViewModelProvider.Factory {
+                        @Suppress("UNCHECKED_CAST")
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            val handle = backStackEntry.savedStateHandle.apply {
+                                set("surahNumber", surahNumber)
+                            }
+                            return com.example.feature.quranreader.QuranReaderViewModel(handle, quranRepo) as T
+                        }
                     }
-                    com.example.feature.quranreader.QuranReaderViewModel(handle, quranRepo)
-                }
+                )
 
                 LaunchedEffect(surahNumber) {
                     viewModel.loadSurah(surahNumber)

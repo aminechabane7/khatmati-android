@@ -68,6 +68,8 @@ import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.WarmBorder
 
+import androidx.compose.runtime.saveable.rememberSaveable
+
 @Composable
 fun MainScreen(
     // Home & Quran data
@@ -94,7 +96,7 @@ fun MainScreen(
     onUpdateThemeMode: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by remember { mutableStateOf(MainBottomTab.HOME) }
+    var selectedTab by rememberSaveable { mutableStateOf(MainBottomTab.HOME) }
 
     BackHandler(enabled = selectedTab != MainBottomTab.HOME) {
         selectedTab = MainBottomTab.HOME

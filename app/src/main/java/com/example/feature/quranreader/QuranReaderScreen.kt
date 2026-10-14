@@ -89,10 +89,17 @@ fun QuranReaderScreen(
     QuranReaderScreen(
         surah = uiState.surah,
         verses = uiState.verses,
-        initialPage = uiState.currentPage,
+        currentPage = uiState.currentPage,
         isBookmarked = uiState.isBookmarked,
-        onToggleBookmark = { _, _, _ -> viewModel.toggleBookmark() },
-        onUpdateReadingPosition = { _, _, page -> viewModel.setPage(page) },
+        readerMode = uiState.readerMode,
+        selectedAyah = uiState.selectedAyah,
+        fontSizeSp = uiState.fontSizeSp,
+        onModeChange = viewModel::setReaderMode,
+        onSelectAyah = viewModel::selectAyah,
+        onPageChange = viewModel::setPage,
+        onFontSizeDecrease = viewModel::decreaseFontSize,
+        onFontSizeIncrease = viewModel::increaseFontSize,
+        onToggleBookmark = viewModel::toggleBookmark,
         onBackClick = onBackClick,
         modifier = modifier
     )
@@ -102,26 +109,24 @@ fun QuranReaderScreen(
 fun QuranReaderScreen(
     surah: Surah,
     verses: List<Ayah>,
-    initialPage: Int,
+    currentPage: Int,
     isBookmarked: Boolean,
-    onToggleBookmark: (Int, Int, Int) -> Unit, // surahNumber, ayahNumber, pageNumber
-    onUpdateReadingPosition: (Int, Int, Int) -> Unit,
+    readerMode: ReaderMode,
+    selectedAyah: Ayah?,
+    fontSizeSp: Float,
+    onModeChange: (ReaderMode) -> Unit,
+    onSelectAyah: (Ayah?) -> Unit,
+    onPageChange: (Int) -> Unit,
+    onFontSizeDecrease: () -> Unit,
+    onFontSizeIncrease: () -> Unit,
+    onToggleBookmark: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BackHandler { onBackClick() }
 
-    var readerMode by remember { mutableStateOf(ReaderMode.MUSHAF) }
-    var selectedAyah by remember(surah.number) { mutableStateOf<Ayah?>(null) }
-    var currentPageNumber by remember(surah.number, initialPage) { mutableIntStateOf(initialPage) }
-    var fontSizeSp by remember { mutableFloatStateOf(24f) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-
-    // Whenever surah or page changes, record reading position
-    LaunchedEffect(surah.number, currentPageNumber) {
-        onUpdateReadingPosition(surah.number, 1, currentPageNumber)
-    }
 
     Box(
         modifier = modifier
@@ -134,20 +139,14 @@ fun QuranReaderScreen(
             // 1. Top Controls Bar
             ReaderTopBar(
                 surah = surah,
-                currentPage = currentPageNumber,
+                currentPage = currentPage,
                 readerMode = readerMode,
                 fontSize = fontSizeSp,
                 isBookmarked = isBookmarked,
-                onModeChange = {
-                    readerMode = it
-                    selectedAyah = null
-                },
-                onFontSizeDecrease = { fontSizeSp = (fontSizeSp - 2f).coerceAtLeast(18f) },
-                onFontSizeIncrease = { fontSizeSp = (fontSizeSp + 2f).coerceAtMost(36f) },
-                onBookmarkClick = {
-                    val ayahNum = selectedAyah?.ayahNumber ?: 1
-                    onToggleBookmark(surah.number, ayahNum, currentPageNumber)
-                },
+                onModeChange = onModeChange,
+                onFontSizeDecrease = onFontSizeDecrease,
+                onFontSizeIncrease = onFontSizeIncrease,
+                onBookmarkClick = onToggleBookmark,
                 onBackClick = onBackClick
             )
 
@@ -163,11 +162,8 @@ fun QuranReaderScreen(
                             surah = surah,
                             verses = verses,
                             fontSizeSp = fontSizeSp,
-                            currentPage = currentPageNumber,
-                            onPageChange = { newPage ->
-                                currentPageNumber = newPage
-                                onUpdateReadingPosition(surah.number, 1, newPage)
-                            }
+                            currentPage = currentPage,
+                            onPageChange = onPageChange
                         )
                     }
                     ReaderMode.AYAH -> {
@@ -177,10 +173,7 @@ fun QuranReaderScreen(
                             selectedAyah = selectedAyah,
                             fontSizeSp = fontSizeSp,
                             onSelectAyah = { ayah ->
-                                selectedAyah = if (selectedAyah?.ayahNumber == ayah.ayahNumber) null else ayah
-                                if (selectedAyah != null) {
-                                    onUpdateReadingPosition(surah.number, ayah.ayahNumber, currentPageNumber)
-                                }
+                                onSelectAyah(if (selectedAyah?.ayahNumber == ayah.ayahNumber) null else ayah)
                             }
                         )
                     }
@@ -208,7 +201,7 @@ fun QuranReaderScreen(
                         }
                     },
                     onBookmark = {
-                        onToggleBookmark(surah.number, ayah.ayahNumber, currentPageNumber)
+                        onToggleBookmark()
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar("تم حفظ الإشارة المرجعية للآية ${DateTimeHelper.toArabicDigits(ayah.ayahNumber)}")
                         }
@@ -223,7 +216,7 @@ fun QuranReaderScreen(
                             snackbarHostState.showSnackbar("تفسير الآية ${DateTimeHelper.toArabicDigits(ayah.ayahNumber)}")
                         }
                     },
-                    onDismiss = { selectedAyah = null }
+                    onDismiss = { onSelectAyah(null) }
                 )
             }
         }
@@ -291,12 +284,14 @@ private fun ReaderTopBar(
                             text = "سورة ${surah.arabicName}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.testTag("reader_surah_title")
                         )
                         Text(
                             text = "صفحة $pageArabic • جزء $juzArabic • $versesCountArabic آية",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.testTag("reader_surah_metadata")
                         )
                     }
                 }
@@ -527,6 +522,46 @@ private fun AyahModeView(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        // Surah Header Ornament for Ayah Mode
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(GoldContainer)
+                        .padding(vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "﴿ سُورَةُ ${surah.arabicName} ﴾",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = GoldOnContainer,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Serif
+                    )
+                }
+
+                if (surah.number != 9 && surah.number != 1) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+                        style = QuranTextStyle.copy(
+                            fontSize = (fontSizeSp + 2).sp,
+                            textAlign = TextAlign.Center
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                }
+            }
+        }
+
         items(verses, key = { "${it.surahNumber}_${it.ayahNumber}" }) { ayah ->
             val isSelected = selectedAyah?.ayahNumber == ayah.ayahNumber
 
